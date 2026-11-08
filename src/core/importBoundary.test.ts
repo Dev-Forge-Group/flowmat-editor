@@ -17,7 +17,7 @@ const forbiddenSpecifiers = [
 
 describe('flowmat-editor import boundary', () => {
   it('keeps production core code independent from UI, API, state, and renderer libraries', () => {
-    const files = collectProductionTypeScriptFiles(join(process.cwd(), 'src', 'lib', 'flowmat-editor'))
+    const files = collectProductionTypeScriptFiles(join(process.cwd(), 'src'))
     const violations = files.flatMap((file) => {
       const source = readFileSync(file, 'utf8')
       return forbiddenSpecifiers
@@ -31,7 +31,7 @@ describe('flowmat-editor import boundary', () => {
   it('keeps every library file free of relative imports that leave the library', () => {
     // Product adapters (for example canvas annotations) live under src/entities and import
     // this library, never the other way round, so the folder can be published as a package.
-    const libraryRoot = join(process.cwd(), 'src', 'lib', 'flowmat-editor')
+    const libraryRoot = join(process.cwd(), 'src')
     const violations = collectSourceFiles(libraryRoot).flatMap((file) =>
       relativeSpecifiers(readFileSync(file, 'utf8'))
         .filter((specifier) => !isInsideDirectory(libraryRoot, resolve(dirname(file), specifier)))
