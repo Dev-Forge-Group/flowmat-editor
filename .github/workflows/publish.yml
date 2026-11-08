@@ -1,12 +1,14 @@
 name: Publish
 
-# A tag vX.Y.Z publishes that version to GitHub Packages as @dev-forge-group/flowmat-editor.
+# Publishes package.json's version to GitHub Packages as @dev-forge-group/flowmat-editor. Either push the matching tag
+# (vX.Y.Z), or run this workflow on main: it then publishes and tags the commit itself.
 on:
   push:
     tags: [ 'v*' ]
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -21,11 +23,17 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@dev-forge-group'
       - run: npm ci
-      - name: Tag matches the package version
+      - name: Version to publish
+        id: version
         run: |
           version=$(node -p "require('./package.json').version")
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "v$version" != "$GITHUB_REF_NAME" ]; then
             echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+          if [ "$GITHUB_REF_TYPE" != tag ] && [ "$GITHUB_REF_NAME" != main ]; then
+            echo "::error::Run this workflow on main, or push a vX.Y.Z tag"
             exit 1
           fi
       - run: npm run typecheck
@@ -33,3 +41,8 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag the published commit
+        if: github.ref_type != 'tag'
+        run: |
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"

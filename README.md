@@ -41,5 +41,6 @@ npm test
 npm run build
 ```
 
-Bump `version` in `package.json`, merge, then push the matching tag (`vX.Y.Z`); the Publish workflow checks the tag,
-tests and publishes it.
+Bump `version` in `package.json` and merge. Then either push the matching tag (`vX.Y.Z`), or run the Publish workflow on
+`main` from the Actions tab: it tests, publishes and tags the commit itself. Publishing a version that already exists
+fails, so each release needs a new version.
