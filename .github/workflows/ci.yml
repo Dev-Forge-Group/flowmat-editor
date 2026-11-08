@@ -20,3 +20,6 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      # The package Node and Vitest load: both entries must import without a bundler.
+      - run: npm run build
+      - run: node -e "Promise.all([import('./dist/index.js'), import('./dist/react/index.js')]).then(() => console.log('entries load'))"

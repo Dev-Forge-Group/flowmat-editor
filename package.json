@@ -1,14 +1,43 @@
 {
-  "name": "@dev-forge/flowmat-editor",
+  "name": "@dev-forge-group/flowmat-editor",
   "version": "0.1.0",
-  "private": true,
+  "description": "FlowMat's vector editor core and its React binding",
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": {
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    }
   },
-  "peerDependencies": { "react": "^19.2.6" },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dev-Forge-Group/flowmat-editor.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/add-js-extensions.mjs dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": "^19.2.6"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/node": "^25.9.3",
     "@types/react": "^19.2.14",
